@@ -1,0 +1,273 @@
+---
+title: "Alara Chat APIs"
+description: "Comprehensive API documentation for Alara's Chat Service"
+version: "0.1.0"
+---
+
+# Alara Chat APIs
+
+Welcome to the Alara Chat API documentation. This API allows you to manage chat FAQs, user queries, and chat sessions.
+
+## Base URL
+
+All URLs referenced in the documentation have the following base:
+
+```
+https://alara-api.issm.ai/faq
+```
+
+## Authentication
+
+The Alara Chat API uses API keys to authenticate requests. You can view and manage your API keys in the Alara Dashboard.
+
+Your API keys carry many privileges, so be sure to keep them secure! Do not share your secret API keys in publicly accessible areas such as GitHub, client-side code, and so forth.
+
+Authentication to the API is performed via HTTP Bearer Auth. Provide your API key as the bearer token value.
+
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Endpoints
+
+### Generate UUID
+
+Generates a UUID for starting a new chat session.
+
+```http
+POST /api/v1/start-chat/
+```
+
+#### Request
+
+This endpoint doesn't require a request body.
+
+#### Response
+
+```json
+{
+  "uuid": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+- `uuid`: string - The generated UUID for the chat session
+
+#### Example
+
+```bash
+curl -X POST https://alara-api.issm.ai/faq/api/v1/start-chat/ \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Save Query
+
+Saves a user query with relevant details.
+
+```http
+POST /api/v1/save-query/
+```
+
+#### Request Body
+
+```json
+{
+  "userId": "user123",
+  "queryText": "How do I reset my password?",
+  "sender": "customer",
+  "additionalInfo": {
+    "browser": "Chrome",
+    "os": "Windows"
+  }
+}
+```
+
+- `userId`: string (required) - The ID of the user submitting the query
+- `queryText`: string (required) - The query text
+- `sender`: string (required) - The sender of the query (e.g., "customer", "agent")
+- `additionalInfo`: object (optional) - Any additional information about the query
+
+#### Response
+
+```json
+{
+  "id": "query123",
+  "status": "saved"
+}
+```
+
+- `id`: string - The unique identifier for the saved query
+- `status`: string - The status of the save operation
+
+#### Example
+
+```bash
+curl -X POST https://alara-api.issm.ai/faq/api/v1/save-query/ \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user123",
+    "queryText": "How do I reset my password?",
+    "sender": "customer",
+    "additionalInfo": {
+      "browser": "Chrome",
+      "os": "Windows"
+    }
+  }'
+```
+
+### Get All Queries
+
+Fetches all queries stored in the system.
+
+```http
+GET /api/v1/queries/
+```
+
+#### Query Parameters
+
+- `page`: integer (optional) - Page number for pagination (default: 1)
+- `limit`: integer (optional) - Number of results per page (default: 20, max: 100)
+
+#### Response
+
+```json
+{
+  "queries": [
+    {
+      "id": "query123",
+      "userId": "user123",
+      "queryText": "How do I reset my password?",
+      "sender": "customer",
+      "timestamp": "2023-04-21T10:30:00Z",
+      "additionalInfo": {
+        "browser": "Chrome",
+        "os": "Windows"
+      }
+    },
+    // ... more queries
+  ],
+  "totalQueries": 150,
+  "page": 1,
+  "limit": 20
+}
+```
+
+#### Example
+
+```bash
+curl -X GET "https://alara-api.issm.ai/faq/api/v1/queries?page=1&limit=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Get User Queries
+
+Fetches all queries made by a specific user.
+
+```http
+GET /api/v1/user-queries/{user_id}
+```
+
+#### Path Parameters
+
+- `user_id`: string (required) - The ID of the user
+
+#### Query Parameters
+
+- `page`: integer (optional) - Page number for pagination (default: 1)
+- `limit`: integer (optional) - Number of results per page (default: 20, max: 100)
+
+#### Response
+
+```json
+{
+  "queries": [
+    {
+      "id": "query123",
+      "queryText": "How do I reset my password?",
+      "sender": "customer",
+      "timestamp": "2023-04-21T10:30:00Z",
+      "additionalInfo": {
+        "browser": "Chrome",
+        "os": "Windows"
+      }
+    },
+    // ... more queries
+  ],
+  "totalQueries": 5,
+  "page": 1,
+  "limit": 20
+}
+```
+
+#### Example
+
+```bash
+curl -X GET "https://alara-api.issm.ai/faq/api/v1/user-queries/user123?page=1&limit=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Check API Status
+
+The default endpoint that can be accessed to check the API's status.
+
+```http
+GET /
+```
+
+#### Response
+
+```json
+{
+  "status": "operational",
+  "version": "0.1.0"
+}
+```
+
+#### Example
+
+```bash
+curl -X GET https://alara-api.issm.ai/faq/ \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Error Handling
+
+The API uses conventional HTTP response codes to indicate the success or failure of an API request. In general:
+
+- Codes in the `2xx` range indicate success.
+- Codes in the `4xx` range indicate an error that failed given the information provided (e.g., a required parameter was omitted, etc.).
+- Codes in the `5xx` range indicate an error with Alara's servers.
+
+### Error Response Format
+
+```json
+{
+  "error": {
+    "code": "invalid_request",
+    "message": "The request was unacceptable, often due to missing a required parameter.",
+    "details": [
+      {
+        "field": "queryText",
+        "message": "This field is required"
+      }
+    ]
+  }
+}
+```
+
+## Rate Limiting
+
+The Alara Chat API implements rate limiting to ensure the stability and availability of the service for all users. The current rate limit is 100 requests per minute per API key.
+
+If you exceed the rate limit, you will receive a 429 Too Many Requests response. The response will include a Retry-After header indicating how long to wait before making another request.
+
+## Changelog
+
+### Version 0.1.0 (Current)
+
+- Initial release of the Alara Chat API
+- Implemented endpoints for starting chat, saving queries, and retrieving queries
+
+## Support
+
+If you have any questions or need help integrating with our API, please contact our support team at api-support@alara.com.

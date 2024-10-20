@@ -1,0 +1,281 @@
+---
+title: 'Bots API'
+description: 'API documentation for the XIVA CHAT SERVICE Bots API'
+api: 'POST /api/v1/bots/message'
+authentication: 'Bearer Token'
+---
+
+# Bots API
+
+The Bots API allows you to interact with the XIVA CHAT SERVICE, specifically for adding messages to conversations.
+
+## Add Message To Conversation
+
+Add a new message to an existing conversation or create a new conversation.
+
+### Request
+
+<ParamField body="results" type="array" required>
+  An array of MessageBody objects.
+</ParamField>
+
+<ParamField body="messageCount" type="integer" required>
+  The total number of messages.
+</ParamField>
+
+<ParamField body="pendingMessageCount" type="integer" required>
+  The number of pending messages.
+</ParamField>
+
+### MessageBody Schema
+
+<ParamField body="from" type="string" required>
+  The sender of the message.
+</ParamField>
+
+<ParamField body="to" type="string" required>
+  The recipient of the message.
+</ParamField>
+
+<ParamField body="integrationType" type="string" required>
+  The type of integration used.
+</ParamField>
+
+<ParamField body="receivedAt" type="string" required>
+  The timestamp when the message was received.
+</ParamField>
+
+<ParamField body="messageId" type="string" required>
+  The unique identifier of the message.
+</ParamField>
+
+<ParamField body="pairedMessageId" type="string">
+  The identifier of a paired message, if applicable.
+</ParamField>
+
+<ParamField body="callbackData" type="string">
+  Additional callback data, if applicable.
+</ParamField>
+
+<ParamField body="message" type="object" required>
+  The content of the message. Contains the following fields:
+  - id (string): Unique identifier for the message content
+  - title (string): Title of the message
+  - description (string): Description of the message
+  - text (string): The main text content of the message
+  - context (object): Contextual information about the message
+  - type (string): The type of the message
+</ParamField>
+
+<ParamField body="contact" type="object" required>
+  Contact information. Contains the following field:
+  - name (string): Name of the contact
+</ParamField>
+
+<ParamField body="price" type="object" required>
+  Price information. Contains the following fields:
+  - pricePerMessage (number): The price per message
+  - currency (string): The currency of the price
+</ParamField>
+
+### Response
+
+<ResponseField name="conversation_id" type="string">
+  The ID of the conversation the message was added to.
+</ResponseField>
+
+<RequestExample>
+
+```json IncomingMessage
+{
+  "results": [
+    {
+      "from": "string",
+      "to": "string",
+      "integrationType": "string",
+      "receivedAt": "string",
+      "messageId": "string",
+      "pairedMessageId": "string",
+      "callbackData": "string",
+      "message": {
+        "id": "string",
+        "title": "string",
+        "description": "string",
+        "text": "string",
+        "context": {
+          "from": "string",
+          "id": "string",
+          "groupId": "string",
+          "referredProduct": "string",
+          "additionalProp1": {}
+        },
+        "type": "string",
+        "additionalProp1": {}
+      },
+      "contact": {
+        "name": "string",
+        "additionalProp1": {}
+      },
+      "price": {
+        "pricePerMessage": 0,
+        "currency": "string",
+        "additionalProp1": {}
+      },
+      "additionalProp1": {}
+    }
+  ],
+  "messageCount": 0,
+  "pendingMessageCount": 0,
+  "additionalProp1": {}
+}
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Response
+{
+  "conversation_id": "conv_12345abcde"
+}
+```
+
+</ResponseExample>
+
+## Examples
+
+### Example 1: Sending a Simple Text Message
+
+```python
+import requests
+import json
+
+url = "https://api.xivabot.com/xiva/chat/api/v1/bots/message"
+headers = {
+    "Authorization": "Bearer YOUR_API_TOKEN",
+    "Content-Type": "application/json"
+}
+
+payload = {
+    "results": [
+        {
+            "from": "+1234567890",
+            "to": "+9876543210",
+            "integrationType": "whatsapp",
+            "receivedAt": "2023-04-21T10:30:00Z",
+            "messageId": "msg_123456",
+            "message": {
+                "id": "mid_123456",
+                "text": "Hello, how can I help you today?",
+                "type": "text"
+            },
+            "contact": {
+                "name": "John Doe"
+            },
+            "price": {
+                "pricePerMessage": 0.01,
+                "currency": "USD"
+            }
+        }
+    ],
+    "messageCount": 1,
+    "pendingMessageCount": 0
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(payload))
+print(response.json())
+```
+
+### Example 2: Sending a Message with Context
+
+```python
+import requests
+import json
+
+url = "https://api.xivabot.com/xiva/chat/api/v1/bots/message"
+headers = {
+    "Authorization": "Bearer YOUR_API_TOKEN",
+    "Content-Type": "application/json"
+}
+
+payload = {
+    "results": [
+        {
+            "from": "+1234567890",
+            "to": "+9876543210",
+            "integrationType": "whatsapp",
+            "receivedAt": "2023-04-21T10:35:00Z",
+            "messageId": "msg_123457",
+            "message": {
+                "id": "mid_123457",
+                "text": "I'd like to know more about the latest smartphone model.",
+                "type": "text",
+                "context": {
+                    "from": "product_inquiry",
+                    "referredProduct": "smartphone_X12"
+                }
+            },
+            "contact": {
+                "name": "Jane Smith"
+            },
+            "price": {
+                "pricePerMessage": 0.01,
+                "currency": "USD"
+            }
+        }
+    ],
+    "messageCount": 1,
+    "pendingMessageCount": 0
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(payload))
+print(response.json())
+```
+
+## Error Responses
+
+<ResponseField name="detail" type="array">
+  An array of validation error objects.
+</ResponseField>
+
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "results"],
+      "msg": "field required",
+      "type": "value_error.missing"
+    }
+  ]
+}
+```
+
+## Detailed Description
+
+When a new message arrives, the following steps are performed:
+
+1. Extract the mobile phone number from the message.
+2. Check if a user with this mobile number exists:
+   - If the user exists, retrieve their ID.
+   - If the user does not exist, create a new user and retrieve their ID.
+3. Check if an active conversation exists for this mobile number in Redis:
+   - If an active conversation exists, retrieve the conversation ID.
+   - If an active conversation does not exist, create a new conversation and retrieve the conversation ID.
+4. Use the conversation ID for all subsequent messages in this conversation.
+5. Save the message to MongoDB.
+6. Save the message to the Redis stream.
+
+The API returns a dictionary containing the conversation ID.
+
+## Notes
+
+- The `IncomingMessage` and `MessageBody` schemas allow for additional properties not specified in the schema (represented by `additionalProp1` in the example).
+- The API supports messages that can perform actions, such as opening a URL or executing a command.
+- Authentication is required. Use a Bearer Token in the Authorization header.
+- Rate limiting may apply. Please check with the API provider for specific limits.
+- The `context` object within the `message` can contain various properties, including `from`, `id`, `groupId`, and `referredProduct`.
+
+## Related Information
+
+- [Message Context Schema](/api-reference/schemas/message-context)
+- [Error Handling](/api-reference/error-handling)

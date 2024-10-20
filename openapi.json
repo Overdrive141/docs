@@ -1,0 +1,375 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "XIVA Single Intent APIs",
+    "description": "These are API docs for XIVA Single Intent API",
+    "version": "0.1.0"
+  },
+  "servers": [{ "url": "/xiva/single_intent" }],
+  "paths": {
+    "/api/v1/start_chat/": {
+      "post": {
+        "tags": ["chat_faqs"],
+        "summary": "Generate Uuid",
+        "operationId": "generate_uuid_api_v1_start_chat__post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/api/v1/save_query/": {
+      "post": {
+        "tags": ["chat_faqs"],
+        "summary": "Save Query",
+        "operationId": "save_query_api_v1_save_query__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChatQuery" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queries/": {
+      "get": {
+        "tags": ["chat_faqs"],
+        "summary": "Get All Queries",
+        "operationId": "get_all_queries_api_v1_queries__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    },
+    "/api/v1/user_queries/{user_id}": {
+      "get": {
+        "tags": ["chat_faqs"],
+        "summary": "Get User Queries",
+        "operationId": "get_user_queries_api_v1_user_queries__user_id__get",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "title": "User Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Main",
+        "operationId": "main__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      },
+      "head": {
+        "summary": "Main",
+        "operationId": "main__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_create_document_api_v1_documents__post": {
+        "properties": {
+          "document_file": {
+            "type": "string",
+            "format": "binary",
+            "title": "Document File"
+          }
+        },
+        "type": "object",
+        "required": ["document_file"],
+        "title": "Body_create_document_api_v1_documents__post"
+      },
+      "ChatQuery": {
+        "properties": {
+          "userId": { "type": "string", "title": "Userid" },
+          "queryText": { "type": "string", "title": "Querytext" },
+          "sender": { "type": "string", "title": "Sender" },
+          "additionalProp1": {
+            "anyOf": [{}, { "type": "null" }],
+            "title": "Additionalprop1"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": ["userId", "queryText", "sender"],
+        "title": "ChatQuery"
+      },
+      "DocumentStatus": {
+        "type": "string",
+        "enum": ["created", "in-processing", "ready"],
+        "title": "DocumentStatus"
+      },
+      "DocumentsAPI": {
+        "properties": {
+          "id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Id",
+            "description": "ID of the document"
+          },
+          "title": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Title",
+            "description": "Title of the document"
+          },
+          "document_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Document Name",
+            "description": "Name of the document"
+          },
+          "topic_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Topic Id",
+            "description": "ID of the topic to which the document belongs"
+          },
+          "subtopic_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Subtopic Id",
+            "description": "ID of the subtopic to which the document belongs"
+          },
+          "cluster_id": {
+            "type": "string",
+            "title": "Cluster Id",
+            "description": "ID of the bot to which the document belongs"
+          },
+          "text": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Text",
+            "description": "Text content of the document"
+          },
+          "status": {
+            "allOf": [{ "$ref": "#/components/schemas/DocumentStatus" }],
+            "description": "Status of the document",
+            "default": "created"
+          },
+          "media_url": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Media Url",
+            "description": "URL of the media file"
+          },
+          "type": { "type": "string", "title": "Type", "default": "document" },
+          "created_at": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Created At",
+            "description": "Creation date of the document"
+          },
+          "updated_at": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Updated At",
+            "description": "Last update date of the document"
+          },
+          "is_deleted": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Is Deleted",
+            "description": "Boolean indicating if the document is deleted",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["cluster_id"],
+        "title": "DocumentsAPI"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Links": {
+        "properties": {
+          "first": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "First",
+            "examples": ["/api/v1/users?limit=1&offset1"]
+          },
+          "last": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Last",
+            "examples": ["/api/v1/users?limit=1&offset1"]
+          },
+          "self": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Self",
+            "examples": ["/api/v1/users?limit=1&offset1"]
+          },
+          "next": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Next",
+            "examples": ["/api/v1/users?limit=1&offset1"]
+          },
+          "prev": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Prev",
+            "examples": ["/api/v1/users?limit=1&offset1"]
+          }
+        },
+        "type": "object",
+        "required": ["first", "last", "self", "next", "prev"],
+        "title": "Links"
+      },
+      "Page_DocumentsAPI_": {
+        "properties": {
+          "items": {
+            "items": { "$ref": "#/components/schemas/DocumentsAPI" },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "anyOf": [
+              { "type": "integer", "minimum": 0.0 },
+              { "type": "null" }
+            ],
+            "title": "Total"
+          },
+          "page": {
+            "anyOf": [
+              { "type": "integer", "minimum": 1.0 },
+              { "type": "null" }
+            ],
+            "title": "Page"
+          },
+          "size": {
+            "anyOf": [
+              { "type": "integer", "minimum": 1.0 },
+              { "type": "null" }
+            ],
+            "title": "Size"
+          },
+          "pages": {
+            "anyOf": [
+              { "type": "integer", "minimum": 0.0 },
+              { "type": "null" }
+            ],
+            "title": "Pages"
+          },
+          "links": { "$ref": "#/components/schemas/Links" }
+        },
+        "type": "object",
+        "required": ["items", "total", "page", "size", "links"],
+        "title": "Page[DocumentsAPI]"
+      },
+        "type": "object",
+        "required": ["items", "total", "page", "size"],
+        "title": "Page[TopicsAPI]"
+      },
+      "SubTopicsAPI": {
+        "properties": {
+          "id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Id",
+            "description": "ID of the subtopic"
+          },
+          "name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Name",
+            "description": "Name of the subtopic"
+          },
+          "topicId": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Topicid",
+            "description": "ID of the topic to which the subtopic belongs"
+          },
+          "type": { "type": "string", "title": "Type", "default": "subtopic" },
+          "createdAt": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Createdat",
+            "description": "Creation date of the subtopic"
+          },
+          "updatedAt": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Updatedat",
+            "description": "Last update date of the subtopic"
+          },
+          "isDeleted": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Isdeleted",
+            "description": "Boolean indicating if the subtopic is deleted",
+            "default": false
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "SubTopicsAPI"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
